@@ -2,6 +2,8 @@
 
 namespace EDI\Generator;
 
+use Carbon\Carbon;
+
 /**
  * Class Interchange
  * @package EDI\Generator
@@ -26,7 +28,7 @@ class Interchange
      * @param null $time
      * @param null $interchangeCode
      */
-    public function __construct($sender, $receiver, $date = null, $time = null, $interchangeCode = null)
+    public function __construct($sender, $receiver, $date = null, $time = null,$dateTime = null ,$interchangeCode = null)
     {
         $this->messages = [];
 
@@ -38,6 +40,7 @@ class Interchange
 
         $this->sender = $sender;
         $this->receiver = $receiver;
+
         if ($date === null) {
             $this->date = date('ymd');
         } else {
@@ -47,6 +50,13 @@ class Interchange
             $this->time = date('Hi');
         } else {
             $this->time = $time;
+        }
+
+        if ($dateTime == null){
+            $this->dateTime = date('YmdHi');
+        }
+        else{
+            $this->dateTime = $dateTime;
         }
 
         $this->charset = ['UNOA', 2];
@@ -86,13 +96,13 @@ class Interchange
     public function compose()
     {
         $temp = [];
-        $temp[] = ['UNB', $this->charset, $this->sender, $this->receiver, [$this->date, $this->time], $this->interchangeCode];
+        $temp[] = ['UNB', $this->charset, [$this->sender,14], [$this->receiver,14] , [$this->date, $this->time], $this->dateTime];
         foreach ($this->messages as $msg) {
             foreach ($msg->getComposed() as $i) {
                 $temp[] = $i;
             }
         }
-        $temp[] = ['UNZ', (string)count($this->messages), $this->interchangeCode];
+        $temp[] = ['UNZ', (string)count($this->messages), $this->dateTime];
         $this->composed = $temp;
 
         return $this;

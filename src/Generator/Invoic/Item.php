@@ -27,6 +27,8 @@ class Item extends Base
     /** @var int */
     protected $discountIndex = 0;
 
+    protected $itemTaxInfo;
+
 
     /**
      * @return array
@@ -85,7 +87,7 @@ class Item extends Base
      */
     public function setGrossPrice($grossPrice)
     {
-        $this->grossPrice = self::addPRISegment('GRP', $grossPrice);
+        $this->grossPrice = self::addPRISegment('AAB', $grossPrice);
         $this->addKeyToCompose('grossPrice');
         return $this;
     }
@@ -104,45 +106,71 @@ class Item extends Base
      */
     public function setNetPrice($netPrice)
     {
-        $this->netPrice = self::addPRISegment('NTP', $netPrice);
+        $this->netPrice = self::addPRISegment('AAA', $netPrice);
         $this->addKeyToCompose('netPrice');
+        return $this;
+    }
+
+    public function addTax($base,$percent=20,$name='VAT')
+    {
+        $this->itemTaxInfo = [
+            'TAX',
+            '7',
+            $name,
+            '',
+            $base,
+            [
+                '',
+                '',
+                '',
+                EdiFactNumber::convert($percent, 0)
+            ],
+            'S'
+        ];
+        $this->addKeyToCompose('itemTaxInfo');
         return $this;
     }
 
     /**
      * @param $value
-     * @param string $discountType
-     * @return Item
+     * @param $percent
+     * @param $amount
+     * @param string $name
+     * @return $this
      */
-    public function addDiscount($value, $discountType = self::DISCOUNT_TYPE_PERCENT)
+    public function addDiscount($value, $percent, $name = '',$qualifier='TD')
     {
         $index = 'discount' . $this->discountIndex++;
         $this->{$index} = [
             'ALC',
+            'A',
             '',
-            floatval($value) > 0 ? 'C' : 'A',
-            '',
-            '',
-            '',
-            'SF',
+            '2',
+            '1',
+            [
+                $qualifier,
+                '',
+                '',
+                $name,
+                ''
+            ]
         ];
         $this->addKeyToCompose($index);
 
-        if ($discountType == self::DISCOUNT_TYPE_PERCENT) {
-            $index = 'discount' . $this->discountIndex++;
-            $this->{$index} = [
-                'PCD',
-                [
-                    '',
-                    '3',
-                    EdiFactNumber::convert(abs($value))
-                ]
-            ];
-            $this->addKeyToCompose($index);
-        }
-
         $index = 'discount' . $this->discountIndex++;
-        $this->{$index} = self::addMOASegment('8', abs($value));
+        $this->{$index} = [
+            'PCD',
+            [
+                '',
+                '1',
+                EdiFactNumber::convert(abs($value))
+            ]
+        ];
+        $this->addKeyToCompose($index);
+
+        // Logic for MOA
+        $index = 'discount' . $this->discountIndex++;
+        $this->{$index} = self::addMOASegment('204', abs($value));
         $this->addKeyToCompose($index);
 
         return $this;

@@ -512,7 +512,8 @@ trait NameAndAddress
         $city = '',
         $countryCode = 'DE',
         $managingOrganisation = 'ZZZ',
-        $sender = null
+        $sender = null,
+        $type = 'SU' // Can be either SE (seller) or SU for (Supplier)
     ) {
         $this->supplierAddress = $this->addNameAndAddress(
             $name1,
@@ -523,7 +524,7 @@ trait NameAndAddress
             $city,
             $countryCode,
             $managingOrganisation,
-            'SU',
+            $type,
             $sender ?? ''
         );
 
@@ -694,7 +695,8 @@ trait NameAndAddress
         $zipCode = '',
         $city = '',
         $countryCode = 'DE',
-        $managingOrganisation = 'ZZZ'
+        $managingOrganisation = 'ZZZ',
+        $organisationCode = ''
     ) {
         $this->invoiceAddress = $this->addNameAndAddress(
             $name1,
@@ -705,7 +707,8 @@ trait NameAndAddress
             $city,
             $countryCode,
             $managingOrganisation,
-            'IV'
+            'IV',
+            $organisationCode
         );
         return $this;
     }

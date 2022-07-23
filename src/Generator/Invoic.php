@@ -46,7 +46,10 @@ class Invoic extends Message
         'manufacturerAddress',
         'wholesalerAddress',
         'deliveryAddress',
+        'supplierAddress',
+        'buyerAddress',
         'invoiceAddress',
+        'deliveryPartyAddress',
         'contactPerson',
         'mailAddress',
         'phoneNumber',
@@ -69,6 +72,8 @@ class Invoic extends Message
     protected $tax;
     /** @var array */
     protected $taxAmount;
+    /** @var array */
+    protected $totalAmount;
 
 
     /**
@@ -84,9 +89,9 @@ class Invoic extends Message
         $messageId = null,
         $identifier = 'INVOIC',
         $version = 'D',
-        $release = '96B',
+        $release = '96A',
         $controllingAgency = 'UN',
-        $association = 'ITEK35'
+        $association = 'EAN008'
     ) {
         parent::__construct(
             $identifier,
@@ -131,6 +136,8 @@ class Invoic extends Message
             'basisAmount',
             'taxableAmount',
             'payableAmount',
+            'totalAmount',
+            'taxAmount',
             'tax',
             'taxAmount',
         ]);
@@ -181,7 +188,7 @@ class Invoic extends Message
      */
     public function setInvoiceDate($invoiceDate)
     {
-        $this->invoiceDate = $this->addDTMSegment($invoiceDate, '3');
+        $this->invoiceDate = $this->addDTMSegment($invoiceDate, '137');
         return $this;
     }
 
@@ -219,6 +226,12 @@ class Invoic extends Message
     public function setReductionOfFeesText($reductionOfFeesText)
     {
         $this->reductionOfFeesText = self::addFTXSegment($reductionOfFeesText, 'OSI', 'HAE');
+        return $this;
+    }
+
+    public function setRegulatoryText($regText,$corporate,$amount)
+    {
+        $this->reductionOfFeesText = self::addFTXSegment($regText, 'REG', '',$corporate,$amount);
         return $this;
     }
 
@@ -323,6 +336,12 @@ class Invoic extends Message
         return $this;
     }
 
+    public function setTotalAmount($totalAmount)
+    {
+        $this->totalAmount  = self::addMOASegment('128', $totalAmount);
+        return $this;
+    }
+
     /**
      * @param string|float $value
      * @param string|float $amount
@@ -335,15 +354,16 @@ class Invoic extends Message
             '7',
             'VAT',
             '',
-            '',
+            $amount,
             [
                 '',
                 '',
                 '',
                 EdiFactNumber::convert($value, 0)
             ],
+            'S'
         ];
-        $this->taxAmount = self::addMOASegment('150', $amount);
+        $this->taxAmount = self::addMOASegment('124', $amount);
         return $this;
     }
 }

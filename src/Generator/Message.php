@@ -212,13 +212,13 @@ class Message extends Base
      * @param string $reference
      * @return array
      */
-    public static function addFTXSegment($text, $qualifier, $reference = '')
+    public static function addFTXSegment($text, $qualifier, $reference = '',$corporate='SARL',$amount='')
     {
         $textLines = str_split($text, 70);
         if (count($textLines) > 5) {
             $textLines = array_slice($textLines, 0, 5);
         }
 
-        return ['FTX', $qualifier, '', [$reference, '89'], $textLines];
+        return ['FTX', $qualifier, '', [$reference],[$text,$corporate,$amount]];
     }
 }

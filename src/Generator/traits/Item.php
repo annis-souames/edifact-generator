@@ -50,18 +50,24 @@ trait Item
     /** @var array IMD M */
     protected $featuresText;
 
+    protected $title;
+
+    protected $itemAmount;
+
     /** @var array */
     protected $composeKeys
         = [
             'position',
             'additionalProductId',
-            'quantity',
             'deliveryNoteDate',
             'orderNumberWholesaler',
             'orderDate',
             'orderPosition',
             'deliveryNoteNumber',
             'deliveryNotePosition',
+            'title',
+            'quantity',
+            'itemAmount'
         ];
 
     /**
@@ -145,41 +151,16 @@ trait Item
      *
      * @return Item
      */
-    public function setQuantity($quantity, $unit = 'PCE', $qualifier = '21')
+    public function setQuantity($quantity, $qualifier = '21')
     {
-        $this->isAllowed(
-            $unit,
-            [
-                'CMK',
-                'CMQ',
-                'CMT',
-                'DZN',
-                'GRM',
-                'HLT',
-                'KGM',
-                'KTM',
-                'LTR',
-                'MMT',
-                'MTK',
-                'MTQ',
-                'MTR',
-                'NRL',
-                'PCE',
-                'PR',
-                'SET',
-                'TNE',
-            ]
-        );
 
         $this->quantity = [
             'QTY',
             [
                 (string)$qualifier,
                 (string)$quantity,
-                $unit,
             ],
         ];
-
         return $this;
     }
 
@@ -229,6 +210,22 @@ trait Item
     public function getAdditionalText()
     {
         return $this->additionalText;
+    }
+
+    public function setTitleText($title)
+    {
+        $this->title = [
+            'IMD',
+            'E',
+            '',
+            [
+                '',
+                '',
+                '',
+                substr($title, 0, 35),
+            ],
+        ];
+        return $this;
     }
 
 
@@ -427,6 +424,12 @@ trait Item
     {
         $this->deliveryNotePosition = $this->addRFFSegment('FI', $deliveryNotePosition);
 
+        return $this;
+    }
+
+    public function setItemAmount($amount)
+    {
+        $this->itemAmount = self::addMOASegment('203',$amount);
         return $this;
     }
 }

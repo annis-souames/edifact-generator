@@ -170,10 +170,9 @@ class Base
             'BGM',
             [
                 $type,
-                '',
-                '89',
             ],
             $documentNumber,
+            '9'
         ];
     }
 
@@ -226,7 +225,6 @@ class Base
         return [
             'MOA',
             [
-                '',
                 (string)$qualifier,
                 EdiFactNumber::convert($value),
             ],
