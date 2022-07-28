@@ -130,6 +130,24 @@ trait NameAndAddress
     /** @var array */
     protected $invoiceAddressFaxNumber;
 
+    /** RFF */
+
+    protected $buyerVatNumber;
+    protected $buyerGovNumber;
+    protected $buyerCompanyNumber;
+
+    protected $sellerVatNumber;
+    protected $sellerGovNumber;
+    protected $sellerCompanyNumber;
+
+    protected $invoiceeVatNumber;
+    protected $invoiceeGovNumber;
+    protected $invoiceeCompanyNumber;
+
+    protected $deliveryVatNumber;
+    protected $deliveryGovNumber;
+    protected $deliveryCompanyNumber;
+
     /**
      * @param string $name1
      * @param string $name2
@@ -224,7 +242,11 @@ trait NameAndAddress
         $city = '',
         $countryCode = 'DE',
         $managingOrganisation = 'ZZZ',
-        $sender = null
+        $sender = null,
+        $withRFF = false,
+        $vatNumber = '',
+        $govNumber = '',
+        $companyNumber = ''
     ) {
         $this->buyerAddress = $this->addNameAndAddress(
             $name1,
@@ -238,6 +260,13 @@ trait NameAndAddress
             'BY',
             $sender ?? ''
         );
+
+        if($withRFF){
+            $this->buyerVatNumber = self::addRFFSegment('VA',$vatNumber);
+            $this->buyerCompanyNumber = self::addRFFSegment('XA',$companyNumber);
+            $this->buyerGovNumber = self::addRFFSegment('GN',$govNumber);
+        }
+
 
         return $this;
     }
@@ -320,7 +349,11 @@ trait NameAndAddress
         $city = '',
         $countryCode = 'DE',
         $managingOrganisation = 'ZZZ',
-        $sender = null
+        $sender = null,
+        $withRFF = false,
+        $vatNumber = '',
+        $govNumber = '',
+        $companyNumber = ''
     ) {
         $this->deliveryPartyAddress = $this->addNameAndAddress(
             $name1,
@@ -334,6 +367,12 @@ trait NameAndAddress
             'DP',
             $sender ?? ''
         );
+
+        if($withRFF){
+            $this->deliveryVatNumber = self::addRFFSegment('VA',$vatNumber);
+            $this->deliveryCompanyNumber = self::addRFFSegment('XA',$companyNumber);
+            $this->deliveryGovNumber = self::addRFFSegment('GN',$govNumber);
+        }
 
         return $this;
     }
@@ -513,7 +552,11 @@ trait NameAndAddress
         $countryCode = 'DE',
         $managingOrganisation = 'ZZZ',
         $sender = null,
-        $type = 'SU' // Can be either SE (seller) or SU for (Supplier)
+        $type = 'SU', // Can be either SE (seller) or SU for (Supplier),
+        $withRFF = false,
+        $vatNumber = '',
+        $govNumber = '',
+        $companyNumber = ''
     ) {
         $this->supplierAddress = $this->addNameAndAddress(
             $name1,
@@ -527,6 +570,13 @@ trait NameAndAddress
             $type,
             $sender ?? ''
         );
+
+        if($withRFF){
+            $this->sellerVatNumber = self::addRFFSegment('VA',$vatNumber);
+            $this->sellerCompanyNumber = self::addRFFSegment('XA',$companyNumber);
+            $this->sellerGovNumber = self::addRFFSegment('GN',$govNumber);
+
+        }
 
         return $this;
     }
@@ -696,7 +746,11 @@ trait NameAndAddress
         $city = '',
         $countryCode = 'DE',
         $managingOrganisation = 'ZZZ',
-        $organisationCode = ''
+        $organisationCode = '',
+        $withRFF = false,
+        $vatNumber = '',
+        $govNumber = '',
+        $companyNumber = ''
     ) {
         $this->invoiceAddress = $this->addNameAndAddress(
             $name1,
@@ -710,6 +764,11 @@ trait NameAndAddress
             'IV',
             $organisationCode
         );
+        if($withRFF){
+            $this->invoiceeVatNumber = self::addRFFSegment('VA',$vatNumber);
+            $this->invoiceeCompanyNumber = self::addRFFSegment('XA',$companyNumber);
+            $this->invoiceeGovNumber = self::addRFFSegment('GN',$govNumber);
+        }
         return $this;
     }
 }

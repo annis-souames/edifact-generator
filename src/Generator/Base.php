@@ -125,7 +125,7 @@ class Base
     protected function addRFFSegment($functionCode, $identifier)
     {
         if (empty($identifier)) {
-            return false;
+            return;
         }
 
         return [

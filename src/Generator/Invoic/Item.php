@@ -161,9 +161,8 @@ class Item extends Base
         $this->{$index} = [
             'PCD',
             [
-                '',
                 '1',
-                EdiFactNumber::convert(abs($value))
+                EdiFactNumber::convert(abs($percent))
             ]
         ];
         $this->addKeyToCompose($index);
