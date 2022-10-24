@@ -38,6 +38,7 @@ class Invoic extends Message
     /** @var array */
     protected $composeKeys = [
         'invoiceNumber',
+        'invoiceReference',
         'invoiceDate',
         'deliveryDate',
         'reductionOfFeesText',
@@ -86,6 +87,8 @@ class Invoic extends Message
     protected $taxAmount;
     /** @var array */
     protected $totalAmount;
+
+    protected $invoiceReference;
 
 
     /**
@@ -144,6 +147,7 @@ class Invoic extends Message
         $this->setPositionSeparator();
         $this->composeByKeys([
             'positionSeparator',
+            'invoiceReference',
             'totalPositionsAmount',
             'basisAmount',
             'taxableAmount',
@@ -376,6 +380,11 @@ class Invoic extends Message
             'S'
         ];
         $this->taxAmount = self::addMOASegment('124', $amount);
+        return $this;
+    }
+
+    public function setInvoiceReference(string $reference){
+        $this->invoiceReference = $this->addRFFSegment('IV',$reference);
         return $this;
     }
 }
