@@ -158,6 +158,15 @@ class Invoic extends Message
             'taxAmount',
         ]);
 
+        // Computing total quantity
+        $totalQuantity = array_reduce($this->items, function($carry, $item)
+        {
+            return (int)$carry + (int)$item->getQuantity()[1][1];
+        });
+        // Adding CNT segments
+        $this->messageContent[] = ['CNT', ['1', (string)$totalQuantity]];
+        $this->messageContent[] = ['CNT', ['2', (string)count($this->items)]];
+
         parent::compose();
         return $this;
     }
