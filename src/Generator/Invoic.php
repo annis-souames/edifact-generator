@@ -379,7 +379,7 @@ class Invoic extends Message
             '7',
             'VAT',
             '',
-            $amount,
+            EdiFactNumber::convert($amount,2),
             [
                 '',
                 '',
