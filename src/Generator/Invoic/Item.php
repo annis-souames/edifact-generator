@@ -17,6 +17,8 @@ class Item extends Base
 
     const DISCOUNT_TYPE_PERCENT = 'percent';
     const DISCOUNT_TYPE_ABSOLUTE = 'absolute';
+    const PRICE_PRECISION_DEC = 3; // Number of decimals for price amounts (advised by FNAC)
+    const TAX_PRECISION_DEC = 2; // Number of decimals for tax amounts (advised by FNAC)
 
     /** @var array */
     protected $invoiceDescription;
@@ -58,13 +60,13 @@ class Item extends Base
      * @param string $priceBaseUnit
      * @return array
      */
-    public static function addPRISegment($qualifier, $value, $priceBase = 1, $priceBaseUnit = 'PCE')
+    public static function addPRISegment($qualifier, $value,  $decimals, $priceBase = 1, $priceBaseUnit = 'PCE')
     {
         return [
             'PRI',
             [
                 $qualifier,
-                EdiFactNumber::convert($value),
+                EdiFactNumber::convert($value,$decimals),
                 '',
                 '',
                 (string)$priceBase,
@@ -85,9 +87,9 @@ class Item extends Base
      * @param string $grossPrice
      * @return Item
      */
-    public function setGrossPrice($grossPrice)
+    public function setGrossPrice($grossPrice,$decimals= self::PRICE_PRECISION_DEC)
     {
-        $this->grossPrice = self::addPRISegment('AAB', $grossPrice);
+        $this->grossPrice = self::addPRISegment('AAB', $grossPrice, $decimals);
         $this->addKeyToCompose('grossPrice');
         return $this;
     }
@@ -104,9 +106,9 @@ class Item extends Base
      * @param string $netPrice
      * @return Item
      */
-    public function setNetPrice($netPrice)
+    public function setNetPrice($netPrice,$decimals=self::PRICE_PRECISION_DEC)
     {
-        $this->netPrice = self::addPRISegment('AAA', $netPrice);
+        $this->netPrice = self::addPRISegment('AAA', $netPrice, $decimals);
         $this->addKeyToCompose('netPrice');
         return $this;
     }
@@ -118,7 +120,7 @@ class Item extends Base
             '7',
             $name,
             '',
-            $base,
+            EdiFactNumber::convert($base,self::TAX_PRECISION_DEC),
             [
                 '',
                 '',
