@@ -153,8 +153,7 @@ class Item extends Base
                 $qualifier,
                 '',
                 '',
-                $name,
-                ''
+                $name
             ]
         ];
         $this->addKeyToCompose($index);
