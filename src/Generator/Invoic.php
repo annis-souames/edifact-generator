@@ -87,8 +87,12 @@ class Invoic extends Message
     protected $taxAmount;
     /** @var array */
     protected $totalAmount;
-
+    /** @var string */
     protected $invoiceReference;
+    /** @var integer */
+    protected $quantityCount;
+    /** @var int */
+    protected $itemsCount;
 
 
     /**
@@ -145,8 +149,19 @@ class Invoic extends Message
         }
 
         $this->setPositionSeparator();
+        // Computing total quantity
+        $totalQuantity = array_reduce($this->items, function($carry, $item)
+        {
+            return (int)$carry + (int)$item->getQuantity()[1][1];
+        });
+        // Adding CNT segments
+        $this->quantityCount = ['CNT', ['1', (string)$totalQuantity]];
+        $this->itemsCount = ['CNT', ['2', (string)count($this->items)]];
+
         $this->composeByKeys([
             'positionSeparator',
+            'quantityCount',
+            'itemsCount',
             'invoiceReference',
             'totalPositionsAmount',
             'basisAmount',
@@ -158,14 +173,6 @@ class Invoic extends Message
             'taxAmount',
         ]);
 
-        // Computing total quantity
-        $totalQuantity = array_reduce($this->items, function($carry, $item)
-        {
-            return (int)$carry + (int)$item->getQuantity()[1][1];
-        });
-        // Adding CNT segments
-        $this->messageContent[] = ['CNT', ['1', (string)$totalQuantity]];
-        $this->messageContent[] = ['CNT', ['2', (string)count($this->items)]];
 
         parent::compose();
         return $this;
@@ -372,23 +379,23 @@ class Invoic extends Message
      * @param string|float $amount
      * @return $this
      */
-    public function setTax($value, $amount)
+    public function setTax($percent, $taxableAmount, $taxAmount)
     {
         $this->tax = [
             'TAX',
             '7',
             'VAT',
             '',
-            EdiFactNumber::convert($amount,2),
+            EdiFactNumber::convert($taxableAmount,2),
             [
                 '',
                 '',
                 '',
-                EdiFactNumber::convert($value, 0)
+                EdiFactNumber::convert($percent, 0)
             ],
             'S'
         ];
-        $this->taxAmount = self::addMOASegment('124', $amount);
+        $this->taxAmount = self::addMOASegment('124', $taxAmount);
         return $this;
     }
 
